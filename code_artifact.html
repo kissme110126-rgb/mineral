@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>測測你的體內能量，正在開幾％省電模式？</title>
+  <!-- Google Fonts: Inter & Noto Sans TC -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tailwind Configuration -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              yellow: '#FFD152',
+              softYellow: '#FFF7D6',
+              mint: '#4ECCA3',
+              softMint: '#E8FBF4',
+              pink: '#FF7B90',
+              softPink: '#FFEBF0',
+              purple: '#845EC2',
+              softPurple: '#F2ECFA',
+              dark: '#2D3142',
+              cream: '#FAFAF7',
+              border: '#E8E8E0'
+            }
+          },
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'Inter', 'sans-serif'],
+            cute: ['"Fredoka"', '"Noto Sans TC"', 'sans-serif']
+          },
+          boxShadow: {
+            'cute': '0 8px 0px rgba(0, 0, 0, 0.08)',
+            'cute-hover': '0 12px 0px rgba(0, 0, 0, 0.08)',
+            'cute-active': '0 2px 0px rgba(0, 0, 0, 0.08)',
+          },
+          animation: {
+            'bounce-gentle': 'bounceGentle 2.2s infinite ease-in-out',
+            'float': 'float 3.5s ease-in-out infinite',
+            'pulse-soft': 'pulseSoft 2s infinite',
+            'wiggle': 'wiggle 1s ease-in-out infinite',
+          },
+          keyframes: {
+            bounceGentle: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-8px)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0) rotate(0deg)' },
+              '50%': { transform: 'translateY(-6px) rotate(2deg)' },
+            },
+            pulseSoft: {
+              '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+              '50%': { transform: 'scale(1.04)', opacity: '0.9' },
+            },
+            wiggle: {
+              '0%, 100%': { transform: 'rotate(-3deg)' },
+              '50%': { transform: 'rotate(3deg)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    * {
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    input, textarea {
+      user-select: auto;
+    }
+    body {
+      background-color: #FFFDF9;
+      background-image: 
+        radial-gradient(#EFE8DB 1.5px, transparent 1.5px),
+        radial-gradient(#FAF3E8 1.5px, #FFFDF9 1.5px);
+      background-size: 30px 30px;
+      background-position: 0 0, 15px 15px;
+      min-height: 100vh;
+      color: #2D3142;
+    }
+    
+    .card-active {
+      transform: scale(1.015);
+      border-color: #FF7B90 !important;
+      background: linear-gradient(135deg, #FFF9FA 0%, #FFF2F4 100%) !important;
+      box-shadow: 0 8px 18px rgba(255, 123, 144, 0.22) !important;
+    }
+
+    .btn-pop {
+      transition: all 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .btn-pop:hover {
+      transform: translateY(-2px);
+    }
+    .btn-pop:active {
+      transform: translateY(2px);
+    }
+
+    .sparkle {
+      pointer-events: none;
+      position: absolute;
+    }
+  </style>
+</head>
+
+<body class="flex flex-col items-center justify-start min-h-screen text-brand-dark px-3 py-4 sm:py-8 antialiased selection:bg-brand-softPink">
+
+  <div id="app" class="w-full max-w-md mx-auto relative flex flex-col justify-start items-center">
+
+    <!-- Header Badge -->
+    <header class="w-full flex items-center justify-between px-3 py-2 mb-3">
+      <div class="flex items-center space-x-2 bg-white/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-amber-100 shadow-sm">
+        <span class="text-xl">⚡</span>
+        <span class="text-xs font-bold tracking-wide text-brand-purple">ENERGY LAB 體內能量所</span>
+      </div>
+      <div id="topStatusChip" class="hidden text-xs bg-emerald-50 text-emerald-700 font-bold px-3 py-1.5 rounded-full border border-emerald-200">
+        🔋 三大面向檢測中
+      </div>
+    </header>
+
+    <!-- 1. HOME SCREEN (首頁) -->
+    <section id="screenHome" class="w-full bg-white rounded-3xl p-6 sm:p-7 border-2 border-brand-border shadow-cute flex flex-col items-center text-center relative overflow-hidden transition-all duration-300">
+      
+      <div class="sparkle top-3 left-4 text-2xl animate-float opacity-80">🌱</div>
+      <div class="sparkle top-4 right-5 text-2xl animate-bounce-gentle opacity-80">✨</div>
+      <div class="sparkle bottom-28 left-4 text-2xl animate-pulse-soft opacity-70">💧</div>
+      <div class="sparkle bottom-32 right-4 text-2xl animate-wiggle opacity-70">⚡</div>
+
+      <!-- Main Animated Cartoon Battery Character -->
+      <div class="relative my-4 group cursor-pointer" onclick="shakeBatteryCharacter()">
+        <div id="heroBatteryAvatar" class="w-40 h-48 mx-auto transition-transform duration-300 transform group-hover:scale-105">
+          <svg viewBox="0 0 200 240" class="w-full h-full drop-shadow-lg" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="75" y="6" width="50" height="16" rx="8" fill="#F4A261" stroke="#2D3142" stroke-width="4"/>
+            <rect x="30" y="22" width="140" height="195" rx="36" fill="#FFFDF5" stroke="#2D3142" stroke-width="6"/>
+            <rect x="42" y="150" width="116" height="55" rx="20" fill="#FFC93C" />
+            <path d="M42 165 C 70 155, 130 175, 158 165 L 158 195 C 158 202, 152 205, 146 205 L 54 205 C 47 205, 42 200, 42 192 Z" fill="#FFAA00" opacity="0.4"/>
+            <path d="M62 90 Q 75 80 84 90" stroke="#2D3142" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+            <path d="M116 90 Q 125 78 138 90" stroke="#2D3142" stroke-width="4.5" stroke-linecap="round" fill="none"/>
+            <circle cx="58" cy="102" r="8" fill="#FF7B90" opacity="0.6"/>
+            <circle cx="142" cy="102" r="8" fill="#FF7B90" opacity="0.6"/>
+            <ellipse cx="100" cy="106" rx="9" ry="12" fill="#2D3142"/>
+            <ellipse cx="100" cy="110" rx="6" ry="6" fill="#FF7B90"/>
+            <path d="M148 55 L 160 55 L 148 70 L 160 70" stroke="#845EC2" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" class="animate-bounce-gentle"/>
+            <path d="M165 40 L 175 40 L 165 50 L 175 50" stroke="#845EC2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M148 95 C 148 95, 155 105, 152 110 C 149 114, 143 111, 143 107 C 143 103, 148 95, 148 95 Z" fill="#4D96FF"/>
+          </svg>
+        </div>
+
+        <div class="absolute -bottom-2 bg-brand-softYellow text-amber-900 border-2 border-amber-300 font-bold text-xs px-3 py-1 rounded-full shadow-sm animate-pulse-soft">
+          我的電量去哪裡了？😴
+        </div>
+      </div>
+
+      <!-- Main Titles -->
+      <div class="mt-4 mb-3 space-y-1.5">
+        <h1 class="text-2xl font-black tracking-tight text-brand-dark leading-snug">
+          測測你的體內能量<br>
+          <span class="text-brand-purple bg-purple-50 px-2 py-0.5 rounded-lg border border-purple-100 inline-block mt-1">正在開幾％省電模式？</span>
+        </h1>
+        <p class="text-xs sm:text-sm font-bold text-brand-pink pt-1">
+          ✨ 人體只佔 4%，卻決定你 100% 的活力與氣色！
+        </p>
+      </div>
+
+      <!-- Subtext -->
+      <div class="bg-brand-softMint/70 border border-emerald-100 rounded-2xl p-3.5 my-3 text-xs text-gray-700 leading-relaxed font-medium">
+        🔋 <span class="font-bold text-emerald-800">3 大面向快檢</span>，共 24 題趣味小指標，看看最近的你，是滿電出發，還是默默開啟了省電模式？
+      </div>
+
+      <!-- Start Button -->
+      <button id="btnStartFlow" class="btn-pop w-full mt-3 py-4 px-6 rounded-2xl bg-gradient-to-r from-brand-yellow via-amber-400 to-amber-500 text-brand-dark font-black text-lg border-2 border-brand-dark shadow-cute flex items-center justify-center space-x-2">
+        <span>⚡ 開始測我的電量</span>
+        <span class="text-xl">➔</span>
+      </button>
+
+      <div class="mt-4 flex items-center justify-center space-x-3 text-gray-400 text-xs font-medium">
+        <span>🕒 只要 3 個頁面勾選</span>
+        <span>•</span>
+        <span>約 1～2 分鐘完成</span>
+      </div>
+    </section>
+
+    <!-- 2. INSTRUCTION MODAL -->
+    <div id="modalInstructions" class="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+      <div class="w-full max-w-sm bg-white rounded-3xl border-2 border-brand-dark p-6 shadow-cute text-center transform transition-all scale-95 duration-200">
+        <div class="w-16 h-16 bg-amber-100 text-3xl flex items-center justify-center rounded-2xl mx-auto mb-3 border-2 border-amber-300">
+          🌱
+        </div>
+        <h3 class="text-xl font-black text-brand-dark mb-2">測驗很簡單！</h3>
+        <div class="space-y-2 text-xs text-gray-600 font-medium text-left bg-gray-50 p-4 rounded-2xl border border-gray-100">
+          <p class="flex items-start"><span class="text-brand-mint font-bold mr-1.5">✓</span> 看看哪些狀況符合最近的你，符合就打勾 ✓</p>
+          <p class="flex items-start"><span class="text-brand-mint font-bold mr-1.5">✓</span> 簡化為 3 大面向頁面，每頁一次檢視 8 題，勾選超順手。</p>
+          <p class="flex items-start"><span class="text-brand-mint font-bold mr-1.5">✓</span> 沒有標準答案，依照你最近的真實狀態回答就好！</p>
+        </div>
+        
+        <button id="btnConfirmStart" class="btn-pop w-full mt-5 py-3.5 rounded-2xl bg-brand-pink text-white font-bold text-base border-2 border-brand-dark shadow-cute">
+          開始囉！⚡
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. QUIZ SCREEN (三大面向分頁制) -->
+    <section id="screenQuiz" class="w-full bg-white rounded-3xl p-4 sm:p-6 border-2 border-brand-border shadow-cute flex flex-col hidden relative">
+      
+      <!-- Top Dynamic Progress Widget -->
+      <div class="w-full bg-brand-cream border-2 border-brand-border rounded-2xl p-3.5 mb-4 sticky top-2 z-20 shadow-sm backdrop-blur-sm bg-brand-cream/95">
+        <div class="flex items-center justify-between text-xs font-bold text-brand-purple mb-1.5">
+          <span class="flex items-center gap-1">
+            <span class="animate-pulse">⚡</span> 你的身體電量偵測中
+          </span>
+          <span id="quizStepText" class="text-brand-dark bg-white px-2.5 py-0.5 rounded-full border border-gray-200">
+            面向 1／3
+          </span>
+        </div>
+
+        <!-- Custom Progress Bar -->
+        <div class="w-full bg-gray-200 h-3 rounded-full overflow-hidden p-0.5 border border-gray-300 flex items-center">
+          <div id="quizProgressBar" class="h-full bg-gradient-to-r from-brand-yellow via-brand-pink to-brand-mint rounded-full transition-all duration-300 ease-out" style="width: 33.3%;"></div>
+        </div>
+
+        <div class="flex justify-between items-center text-[10px] font-bold text-gray-500 mt-1.5 px-1">
+          <span id="pageTallyStatus">已勾選 0／8 題</span>
+          <span id="quizProgressPercent">33%</span>
+        </div>
+      </div>
+
+      <!-- Section Title Banner -->
+      <div id="sectionHeaderBadge" class="mb-4 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-3.5">
+        <div class="flex items-center space-x-2">
+          <span id="sectionIcon" class="text-2xl">❤️</span>
+          <div>
+            <h2 id="sectionTitle" class="text-sm font-black text-amber-900 leading-tight">① 生活電力與修復力</h2>
+            <p id="sectionSub" class="text-[11px] text-amber-700 mt-0.5">測測你的生活步調，是否正在超速透支你的身體？</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8 Questions Card List in Current Page -->
+      <div id="pageQuestionsList" class="w-full space-y-2.5">
+        <!-- Rendered by JS: 8 cards per page -->
+      </div>
+
+      <!-- Bottom Navigation Buttons -->
+      <div class="flex items-center justify-between mt-6 gap-3 pt-3 border-t border-gray-100">
+        <button id="btnPrevPage" class="btn-pop px-4 py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-xs border border-gray-300 hover:bg-gray-200 disabled:opacity-30 disabled:pointer-events-none flex items-center gap-1">
+          <span>◀</span> 回上一頁
+        </button>
+        <button id="btnNextPage" class="btn-pop flex-1 py-3.5 rounded-2xl bg-brand-yellow text-brand-dark font-black text-sm border-2 border-brand-dark shadow-cute flex items-center justify-center gap-1.5">
+          <span id="nextBtnLabel">前往第二面向 ⚡</span>
+          <span class="text-base">➔</span>
+        </button>
+      </div>
+
+      <div class="mt-3 text-center text-[11px] text-gray-400 font-medium">
+        全站共累積標記 <span id="currentTotalTickCount" class="font-bold text-brand-pink text-xs">0</span> 個身體省電訊號
+      </div>
+    </section>
+
+    <!-- 4. ANALYZING / LOADING SCREEN -->
+    <section id="screenAnalyzing" class="w-full bg-white rounded-3xl p-8 border-2 border-brand-border shadow-cute flex flex-col items-center justify-center text-center hidden min-h-[420px]">
+      
+      <div class="relative w-36 h-44 mb-6">
+        <svg viewBox="0 0 200 240" class="w-full h-full animate-bounce-gentle" fill="none">
+          <rect x="75" y="6" width="50" height="16" rx="8" fill="#F4A261" stroke="#2D3142" stroke-width="4"/>
+          <rect x="30" y="22" width="140" height="195" rx="36" fill="#FFFDF5" stroke="#2D3142" stroke-width="6"/>
+          <rect id="chargingLevelRect" x="42" y="180" width="116" height="25" rx="16" fill="#4ECCA3" class="transition-all duration-1000"/>
+          <circle cx="75" cy="85" r="7" fill="#2D3142" />
+          <circle cx="125" cy="85" r="7" fill="#2D3142" />
+          <circle cx="77" cy="83" r="2.5" fill="#FFF" />
+          <circle cx="127" cy="83" r="2.5" fill="#FFF" />
+          <path d="M92 105 Q 100 115 108 105" stroke="#2D3142" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M100 135 L93 150 L102 150 L96 168" stroke="#FFD152" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        </svg>
+      </div>
+
+      <h3 id="analyzingStateText" class="text-lg font-black text-brand-dark mb-1 animate-pulse">
+        正在偵測你的體內能量……
+      </h3>
+      <p class="text-xs text-gray-500 font-medium mb-4">
+        可愛小電池正在計算三大面向電力指數
+      </p>
+
+      <div class="w-48 bg-gray-100 h-2.5 rounded-full overflow-hidden border border-gray-200">
+        <div id="analyzingBar" class="h-full bg-brand-purple rounded-full transition-all duration-1000 w-0"></div>
+      </div>
+    </section>
+
+    <!-- 5. RESULT SCREEN (結果頁面) -->
+    <section id="screenResult" class="w-full flex flex-col items-center hidden space-y-4">
+      
+      <!-- Energy Card Container -->
+      <div id="resultCaptureWrapper" class="w-full bg-white rounded-3xl p-5 sm:p-6 border-2 border-brand-dark shadow-cute flex flex-col items-center text-center relative overflow-hidden">
+        
+        <div class="inline-flex items-center space-x-1.5 px-3.5 py-1 rounded-full text-xs font-black bg-brand-softPurple text-brand-purple border border-purple-200 mb-2">
+          <span>⚡</span>
+          <span>我的體內能量測驗結果</span>
+        </div>
+
+        <h2 id="resultMainTitle" class="text-xl sm:text-2xl font-black text-brand-dark leading-tight mt-1"></h2>
+
+        <div id="resultTagsContainer" class="flex flex-wrap justify-center gap-1.5 my-3"></div>
+
+        <!-- Cartoon Battery Result Character Illustration -->
+        <div class="relative w-44 h-48 my-2">
+          <div id="resultBatteryAvatarContainer" class="w-full h-full flex items-center justify-center"></div>
+        </div>
+
+        <div class="bg-amber-50 border-2 border-amber-300 px-4 py-1.5 rounded-2xl shadow-sm text-sm font-black text-amber-900 mb-3 flex items-center space-x-2">
+          <span id="resultBatteryPctText">⚡ 95% 滿電</span>
+        </div>
+
+        <!-- Narrative Content -->
+        <div class="bg-gray-50 rounded-2xl p-4 text-left text-xs text-gray-700 leading-relaxed border border-gray-200 space-y-2 mb-3">
+          <p id="resultTextParagraph1" class="font-bold text-gray-800"></p>
+          <p id="resultTextParagraph2"></p>
+          <p id="resultTextParagraph3" class="text-gray-500 italic text-[11px]"></p>
+        </div>
+
+        <!-- Action Hook Card -->
+        <div id="actionHookCard" class="w-full bg-brand-softMint border border-emerald-200 rounded-2xl p-3 text-left text-xs text-emerald-900 font-medium"></div>
+
+        <!-- Radar / Dimension Breakdown -->
+        <div class="w-full mt-4 bg-white border border-gray-200 rounded-2xl p-3.5 shadow-sm text-left">
+          <div class="flex items-center justify-between mb-2">
+            <h4 class="text-xs font-black text-brand-dark flex items-center gap-1">
+              <span>📊</span> 我的省電雷達面向分析
+            </h4>
+            <span class="text-[10px] text-gray-400 font-bold">健康指數（滿格佳）</span>
+          </div>
+
+          <div class="space-y-2.5">
+            <div>
+              <div class="flex justify-between text-[11px] font-bold text-gray-700 mb-1">
+                <span>❤️ 生活修復力</span>
+                <span id="scoreLifeVal">100%</span>
+              </div>
+              <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                <div id="barLife" class="h-full bg-rose-400 rounded-full transition-all duration-700" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[11px] font-bold text-gray-700 mb-1">
+                <span>🥗 飲食與補水</span>
+                <span id="scoreDietVal">100%</span>
+              </div>
+              <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                <div id="barDiet" class="h-full bg-emerald-400 rounded-full transition-all duration-700" style="width: 100%;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex justify-between text-[11px] font-bold text-gray-700 mb-1">
+                <span>⚡ 身體狀態</span>
+                <span id="scoreBodyVal">100%</span>
+              </div>
+              <div class="w-full bg-gray-100 h-2.5 rounded-full overflow-hidden">
+                <div id="barBody" class="h-full bg-amber-400 rounded-full transition-all duration-700" style="width: 100%;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Top Drain Sources -->
+        <div class="w-full mt-3 bg-amber-50/60 border border-amber-200 rounded-2xl p-3 text-left">
+          <h4 class="text-xs font-black text-amber-900 mb-2 flex items-center gap-1">
+            <span>🔍</span> 找到你的主要耗電來源
+          </h4>
+          <div id="drainSourcesList" class="flex flex-wrap gap-1.5"></div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-gray-100 w-full text-center">
+          <p class="text-[11px] font-black text-brand-purple">
+            ✨ 人體只佔 4%，卻決定你 100% 的活力與氣色！
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="w-full space-y-2.5 px-1">
+        <div class="grid grid-cols-2 gap-2.5">
+          <button id="btnSaveCard" class="btn-pop py-3.5 px-3 rounded-2xl bg-brand-pink text-white font-bold text-sm border-2 border-brand-dark shadow-cute flex items-center justify-center gap-1.5">
+            <span>📸</span> 儲存能量卡
+          </button>
+          <button id="btnShareFriend" class="btn-pop py-3.5 px-3 rounded-2xl bg-emerald-500 text-white font-bold text-sm border-2 border-brand-dark shadow-cute flex items-center justify-center gap-1.5">
+            <span>📤</span> 分享給朋友
+          </button>
+        </div>
+
+        <button id="btnRetest" class="btn-pop w-full py-3 rounded-2xl bg-white text-gray-700 font-bold text-sm border-2 border-gray-300 shadow-sm hover:bg-gray-50 flex items-center justify-center gap-1.5">
+          <span>🔄</span> 清除答案・重新測驗
+        </button>
+      </div>
+
+      <footer class="w-full px-4 py-2 text-center text-[10px] text-gray-400 leading-normal">
+        ※ 本測驗為趣味性的生活狀態自我檢視，結果不代表醫療診斷，也不能用來判定是否缺乏特定營養素或礦物質。如有持續或嚴重不適，請諮詢醫療專業人員。
+      </footer>
+    </section>
+
+    <!-- Offscreen Canvas for Exporting High-Quality Share Card -->
+    <canvas id="exportCanvas" width="900" height="1200" class="hidden"></canvas>
+
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-brand-dark text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg opacity-0 transition-opacity duration-300 pointer-events-none">
+      已成功複製分享連結！
+    </div>
+
+  </div>
+
+  <script>
+    /* -------------------------------------------------------------
+     * 三大面向資料（每面向 8 題，共 24 題）
+     * ------------------------------------------------------------- */
+    const QUIZ_PAGES = [
+      {
+        pageIndex: 0,
+        partNumber: "①",
+        title: "① 生活電力與修復力",
+        subtitle: "測測你的生活步調，是否正在超速透支你的身體？",
+        icon: "❤️",
+        nextButtonText: "前往第二面向 ⚡",
+        questions: [
+          { id: 1, tag: "高壓緊繃", desc: "平常步調緊湊、經常覺得壓力大到肩膀沉重", drainIcon: "😵", drainName: "高壓緊繃" },
+          { id: 2, tag: "缺乏活動", desc: "上班久坐一整天，一週幾乎沒什麼規律運動", drainIcon: "🪑", drainName: "久坐缺動" },
+          { id: 3, tag: "睡眠不足", desc: "常常習慣性熬夜，或每天睡不滿 6～7 小時", drainIcon: "🥱", drainName: "睡眠不足" },
+          { id: 4, tag: "抽菸習慣", desc: "平時有抽菸習慣，或經常處於二手菸環境", drainIcon: "🚬", drainName: "菸害干擾" },
+          { id: 5, tag: "長期用藥", desc: "長期規律服用胃藥、消炎藥、緩瀉劑或利尿劑等", drainIcon: "💊", drainName: "代謝負擔" },
+          { id: 6, tag: "特殊時期", desc: "目前正處於懷孕期、產後哺乳階段", drainIcon: "🍼", drainName: "特殊消耗" },
+          { id: 7, tag: "重大創傷", desc: "曾動過重大手術，或有特定器官切除病史", drainIcon: "🩹", drainName: "修復耗損" },
+          { id: 8, tag: "睡不解累", desc: "入睡困難、淺眠容易醒，隔天起床還是覺得很累", drainIcon: "💤", drainName: "睡眠品質差" }
+        ]
+      },
+      {
+        pageIndex: 1,
+        partNumber: "②",
+        title: "② 飲食習慣與補水品質",
+        subtitle: "測測你吃進去的，是在補充營養還是悄悄帶走礦物質？",
+        icon: "🥗",
+        nextButtonText: "前往第三面向 ⚡",
+        questions: [
+          { id: 9, tag: "三餐外食", desc: "平時以便利超商或外食為主，經常偏食或挑食", drainIcon: "🍱", drainName: "外食挑食" },
+          { id: 10, tag: "飲食失衡", desc: "用餐時間不固定，常常忙到忘記吃、餓過頭又暴飲暴食", drainIcon: "⏰", drainName: "餐期混亂" },
+          { id: 11, tag: "愛精緻糖", desc: "嘴饞時偏好蛋糕甜點、含糖手搖、炸物速食等加工精緻食品", drainIcon: "🍰", drainName: "精緻糖炸物" },
+          { id: 12, tag: "極端烹調", desc: "為了減肥長期嚴格節食，或餐餐只吃去油水煮餐", drainIcon: "🥗", drainName: "極端去油" },
+          { id: 13, tag: "蔬果告急", desc: "每天吃不到 5 種顏色或 2 碗份量的蔬菜水果", drainIcon: "🥦", drainName: "蔬果攝取少" },
+          { id: 14, tag: "飲料依賴", desc: "每週喝咖啡、濃茶、可樂或酒精達 2 次以上", drainIcon: "☕", drainName: "咖啡因/酒精" },
+          { id: 15, tag: "飲水不足", desc: "每天白開水喝不到 2000 cc（口渴才喝水）", drainIcon: "💧", drainName: "飲水不足" },
+          { id: 16, tag: "喝純淨水", desc: "平時習慣飲用 RO 逆滲透水、蒸餾水等「零礦物質」純水", drainIcon: "🚰", drainName: "純水少礦" }
+        ]
+      },
+      {
+        pageIndex: 2,
+        partNumber: "③",
+        title: "③ 身體發出的微警訊",
+        subtitle: "測測你的細胞是否已經開始向你發出求救訊號？",
+        icon: "⚡",
+        nextButtonText: "完成檢測，產生能量報告！⚡",
+        questions: [
+          { id: 17, tag: "容易斷電", desc: "下午容易哈欠連連、精神不振，體力大不如前", drainIcon: "🪫", drainName: "午後斷電" },
+          { id: 18, tag: "思緒當機", desc: "記憶力變差、注意力難集中，常覺得腦袋鈍鈍的", drainIcon: "🧠", drainName: "思緒卡關" },
+          { id: 19, tag: "情緒波動", desc: "容易心浮氣躁、神經緊繃焦慮，或莫名感到低落沮喪", drainIcon: "🌪️", drainName: "情緒起伏" },
+          { id: 20, tag: "肌肉抗議", desc: "肩頸肌肉長期緊繃僵硬，或半夜腿部容易抽筋", drainIcon: "🦵", drainName: "肌肉緊繃抽筋" },
+          { id: 21, tag: "循環不良", desc: "無論春夏秋冬，常常手腳冰冷、容易頭暈目眩", drainIcon: "🧊", drainName: "手腳冰冷" },
+          { id: 22, tag: "消化不順", desc: "腸胃吸收差，經常脹氣、消化不良，有便秘或腹瀉困擾", drainIcon: "🤢", drainName: "腸胃脹悶" },
+          { id: 23, tag: "顏值警報", desc: "面色發黃蒼白、皮膚乾燥粗糙，或頭髮分叉乾枯容易掉", drainIcon: "💆", drainName: "氣色暗沉乾枯" },
+          { id: 24, tag: "防禦低落", desc: "刷牙容易牙齦流血、有口臭困擾，或是變天就容易感冒", drainIcon: "🛡️", drainName: "防禦力下降" }
+        ]
+      }
+    ];
+
+    /* Flatten array for easy lookup */
+    const ALL_QUESTIONS_MAP = {};
+    QUIZ_PAGES.forEach(p => {
+      p.questions.forEach(q => {
+        ALL_QUESTIONS_MAP[q.id] = q;
+      });
+    });
+
+    /* State */
+    let currentPageIndex = 0; // 0, 1, 2
+    let checkedMap = {}; // { [id]: boolean }
+
+    // DOM Elements
+    const screenHome = document.getElementById('screenHome');
+    const modalInstructions = document.getElementById('modalInstructions');
+    const screenQuiz = document.getElementById('screenQuiz');
+    const screenAnalyzing = document.getElementById('screenAnalyzing');
+    const screenResult = document.getElementById('screenResult');
+    const topStatusChip = document.getElementById('topStatusChip');
+
+    const btnStartFlow = document.getElementById('btnStartFlow');
+    const btnConfirmStart = document.getElementById('btnConfirmStart');
+    const pageQuestionsList = document.getElementById('pageQuestionsList');
+    const quizStepText = document.getElementById('quizStepText');
+    const quizProgressBar = document.getElementById('quizProgressBar');
+    const quizProgressPercent = document.getElementById('quizProgressPercent');
+    const pageTallyStatus = document.getElementById('pageTallyStatus');
+    const sectionTitle = document.getElementById('sectionTitle');
+    const sectionSub = document.getElementById('sectionSub');
+    const sectionIcon = document.getElementById('sectionIcon');
+    const btnPrevPage = document.getElementById('btnPrevPage');
+    const btnNextPage = document.getElementById('btnNextPage');
+    const nextBtnLabel = document.getElementById('nextBtnLabel');
+    const currentTotalTickCount = document.getElementById('currentTotalTickCount');
+
+    const btnSaveCard = document.getElementById('btnSaveCard');
+    const btnShareFriend = document.getElementById('btnShareFriend');
+    const btnRetest = document.getElementById('btnRetest');
+    const toast = document.getElementById('toast');
+
+    btnStartFlow.addEventListener('click', () => {
+      modalInstructions.classList.remove('hidden');
+    });
+
+    btnConfirmStart.addEventListener('click', () => {
+      modalInstructions.classList.add('hidden');
+      screenHome.classList.add('hidden');
+      screenQuiz.classList.remove('hidden');
+      topStatusChip.classList.remove('hidden');
+      renderPage(0);
+    });
+
+    btnPrevPage.addEventListener('click', () => {
+      if (currentPageIndex > 0) {
+        renderPage(currentPageIndex - 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+
+    btnNextPage.addEventListener('click', () => {
+      if (currentPageIndex < QUIZ_PAGES.length - 1) {
+        renderPage(currentPageIndex + 1);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        finishQuiz();
+      }
+    });
+
+    btnRetest.addEventListener('click', () => {
+      checkedMap = {};
+      currentPageIndex = 0;
+      screenResult.classList.add('hidden');
+      topStatusChip.classList.add('hidden');
+      screenHome.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast('測驗已重設，隨時可以再次檢測！');
+    });
+
+    btnSaveCard.addEventListener('click', () => {
+      generateAndDownloadCard();
+    });
+
+    btnShareFriend.addEventListener('click', () => {
+      handleShare();
+    });
+
+    /* Render an entire page of 8 questions */
+    function renderPage(pageIdx) {
+      currentPageIndex = pageIdx;
+      const pageData = QUIZ_PAGES[pageIdx];
+
+      // Update Section Header Info
+      sectionTitle.textContent = pageData.title;
+      sectionSub.textContent = pageData.subtitle;
+      sectionIcon.textContent = pageData.icon;
+
+      // Update Page Progress Info
+      const currentNumber = pageIdx + 1;
+      const totalPages = QUIZ_PAGES.length;
+      quizStepText.textContent = `面向 ${currentNumber}／${totalPages}`;
+      const pct = Math.round((currentNumber / totalPages) * 100);
+      quizProgressBar.style.width = `${pct}%`;
+      quizProgressPercent.textContent = `${pct}%`;
+
+      // Update Navigation Buttons
+      btnPrevPage.disabled = (pageIdx === 0);
+      nextBtnLabel.textContent = pageData.nextButtonText;
+
+      // Render 8 Question Cards for current page
+      let cardsHtml = '';
+      let pageCheckedCount = 0;
+
+      pageData.questions.forEach(q => {
+        const isChecked = !!checkedMap[q.id];
+        if (isChecked) pageCheckedCount++;
+
+        cardsHtml += `
+          <div id="qCard_${q.id}" onclick="togglePageAnswer(${q.id})" 
+               class="btn-pop w-full cursor-pointer rounded-2xl p-4 border-2 transition-all duration-200 select-none flex items-start gap-3.5 ${
+                 isChecked 
+                   ? 'card-active border-brand-pink bg-brand-softPink/60' 
+                   : 'bg-white border-brand-border hover:border-amber-300'
+               }">
+            
+            <!-- Large Checkbox -->
+            <div class="mt-0.5 flex-shrink-0 w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all duration-200 ${
+              isChecked 
+                ? 'bg-brand-pink border-brand-pink text-white shadow-sm scale-105' 
+                : 'bg-gray-50 border-gray-300 text-transparent'
+            }">
+              <svg class="w-4 h-4 fill-current stroke-current" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="text-xs font-black px-2 py-0.5 rounded-md ${
+                  isChecked ? 'bg-brand-pink text-white' : 'bg-gray-100 text-gray-700'
+                }">
+                  ${q.tag}
+                </span>
+                ${isChecked ? '<span class="text-[11px] text-amber-500 font-bold animate-wiggle">✓ 符合</span>' : ''}
+              </div>
+              <p class="text-xs sm:text-sm font-bold text-gray-800 leading-snug">
+                ${q.desc}
+              </p>
+            </div>
+          </div>
+        `;
+      });
+
+      pageQuestionsList.innerHTML = cardsHtml;
+      updatePageTally(pageCheckedCount);
+      updateTotalTickCount();
+    }
+
+    function togglePageAnswer(id) {
+      checkedMap[id] = !checkedMap[id];
+      // Refresh only current page cards without jumping
+      renderPage(currentPageIndex);
+    }
+
+    function updatePageTally(count) {
+      pageTallyStatus.textContent = `本面向已勾選 ${count}／8 題`;
+    }
+
+    function updateTotalTickCount() {
+      const count = Object.values(checkedMap).filter(Boolean).length;
+      currentTotalTickCount.textContent = count;
+    }
+
+    function shakeBatteryCharacter() {
+      const avatar = document.getElementById('heroBatteryAvatar');
+      avatar.classList.add('animate-wiggle');
+      setTimeout(() => {
+        avatar.classList.remove('animate-wiggle');
+      }, 1000);
+    }
+
+    function finishQuiz() {
+      screenQuiz.classList.add('hidden');
+      screenAnalyzing.classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const analyzingBar = document.getElementById('analyzingBar');
+      const analyzingStateText = document.getElementById('analyzingStateText');
+      const chargingLevelRect = document.getElementById('chargingLevelRect');
+
+      analyzingBar.style.width = '45%';
+      chargingLevelRect.setAttribute('height', '40');
+      chargingLevelRect.setAttribute('y', '165');
+
+      setTimeout(() => {
+        analyzingStateText.textContent = "⚡ 能量分析完成！正在加載體內電池……";
+        analyzingBar.style.width = '100%';
+        chargingLevelRect.setAttribute('height', '90');
+        chargingLevelRect.setAttribute('y', '115');
+      }, 700);
+
+      setTimeout(() => {
+        screenAnalyzing.classList.add('hidden');
+        renderFinalResults();
+        screenResult.classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }, 1500);
+    }
+
+    let currentResultData = null;
+
+    function renderFinalResults() {
+      const totalChecked = Object.values(checkedMap).filter(Boolean).length;
+      
+      let lifeChecked = 0;
+      let dietChecked = 0;
+      let bodyChecked = 0;
+
+      for (let i = 1; i <= 8; i++) {
+        if (checkedMap[i]) lifeChecked++;
+      }
+      for (let i = 9; i <= 16; i++) {
+        if (checkedMap[i]) dietChecked++;
+      }
+      for (let i = 17; i <= 24; i++) {
+        if (checkedMap[i]) bodyChecked++;
+      }
+
+      // 健康面向百分比（勾越少越充沛）
+      const lifePct = Math.max(10, Math.round(((8 - lifeChecked) / 8) * 100));
+      const dietPct = Math.max(10, Math.round(((8 - dietChecked) / 8) * 100));
+      const bodyPct = Math.max(10, Math.round(((8 - bodyChecked) / 8) * 100));
+
+      let tier = 1;
+      let batteryPctText = "⚡ 95% 滿電";
+      let batteryNum = 95;
+      let mainTitle = "🌟 生活自律大師｜代謝資優生";
+      let tags = ["仙境體質", "代謝資優生", "滿電出發"];
+      let p1 = "你真的是現代人嗎？在滿街精緻澱粉、熬夜外食的環境裡，你竟然把自己照顧得像從仙境走出來的！";
+      let p2 = "你的日常狀態看起來維持得相當不錯，代表體內能量流動很順暢，繼續保持現在的生活節奏！";
+      let p3 = "人體的微量元素與水分調節維持得相當高水準，是身邊朋友值得學習的榜樣！";
+      let hook = "保持這份節奏！但如果最近偶爾開始覺得緊繃或水喝不夠，記得留意日常補水與均衡飲食，別讓生活中的小習慣慢慢累積。";
+
+      if (totalChecked >= 4 && totalChecked <= 8) {
+        tier = 2;
+        batteryPctText = "⚡ 35% 省電模式中";
+        batteryNum = 35;
+        mainTitle = "🔋 低電量超人｜身體正在靜音抗議！";
+        tags = ["假裝沒事高手", "下午三點斷電", "水分沙漠區"];
+        p1 = "外表看起來很能扛，其實最近的生活節奏可能已經讓你的身體進入『省電模式』了！";
+        p2 = "最近是不是總覺得莫名卡卡的：明明睡了卻還是累、肩頸常緊繃、皮膚時不時乾癢粗糙？這些都是值得你停下來觀察自己的小訊號。";
+        p3 = "日常的咖啡因、精緻糖、壓力、睡眠不足與飲食不均衡，都可能讓生活狀態更加疲憊。";
+        hook = "想知道下午不靠咖啡續命、讓自己更有精神的小祕訣嗎？從今天開始，先把喝水、睡眠與均衡飲食做好！";
+      } else if (totalChecked >= 9) {
+        tier = 3;
+        batteryPctText = "⚡ 15% 極低電量（急需充電）";
+        batteryNum = 15;
+        mainTitle = "🚨 礦物質赤字大戶｜急需進廠深度大修！";
+        tags = ["全身警報連響", "低電量！", "需要充電！", "休息一下！"];
+        p1 = "先抱一個！這陣子真的辛苦了。從你的回答來看，最近可能有不少生活習慣正在悄悄消耗你的體內能量。";
+        p2 = "容易抽筋、思緒卡關、氣色變化、情緒起伏、手腳冰冷……這些狀況值得你多留意自己的睡眠、補水、飲食與生活節奏。";
+        p3 = "礦物質是人體重要的營養素之一，日常飲食是否均衡，值得好好檢視。";
+        hook = "先別急著責怪自己！從補水、均衡飲食、充足睡眠與適度伸展開始，一點一點把生活電力充回來。";
+      }
+
+      currentResultData = {
+        tier,
+        totalChecked,
+        batteryNum,
+        batteryPctText,
+        mainTitle,
+        tags,
+        p1,
+        p2,
+        hook,
+        lifePct,
+        dietPct,
+        bodyPct
+      };
+
+      document.getElementById('resultMainTitle').textContent = mainTitle;
+      document.getElementById('resultBatteryPctText').textContent = batteryPctText;
+      document.getElementById('resultTextParagraph1').textContent = p1;
+      document.getElementById('resultTextParagraph2').textContent = p2;
+      document.getElementById('resultTextParagraph3').textContent = p3;
+      
+      const hookContainer = document.getElementById('actionHookCard');
+      hookContainer.innerHTML = `<span class="font-bold">🌱 活力行動建議：</span>${hook}`;
+
+      const tagsContainer = document.getElementById('resultTagsContainer');
+      tagsContainer.innerHTML = tags.map(t => `
+        <span class="px-2.5 py-1 text-[11px] font-bold rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+          #${t}
+        </span>
+      `).join('');
+
+      renderBatteryAvatar(tier);
+
+      document.getElementById('scoreLifeVal').textContent = `${lifePct}%`;
+      document.getElementById('barLife').style.width = `${lifePct}%`;
+
+      document.getElementById('scoreDietVal').textContent = `${dietPct}%`;
+      document.getElementById('barDiet').style.width = `${dietPct}%`;
+
+      document.getElementById('scoreBodyVal').textContent = `${bodyPct}%`;
+      document.getElementById('barBody').style.width = `${bodyPct}%`;
+
+      renderTopDrainSources();
+    }
+
+    function renderBatteryAvatar(tier) {
+      const container = document.getElementById('resultBatteryAvatarContainer');
+      let svgContent = '';
+
+      if (tier === 1) {
+        svgContent = `
+          <svg viewBox="0 0 200 240" class="w-full h-full drop-shadow-md animate-bounce-gentle" fill="none">
+            <rect x="75" y="6" width="50" height="16" rx="8" fill="#4ECCA3" stroke="#2D3142" stroke-width="4"/>
+            <rect x="30" y="22" width="140" height="195" rx="36" fill="#FFFDF5" stroke="#2D3142" stroke-width="6"/>
+            <rect x="42" y="36" width="116" height="169" rx="26" fill="#4ECCA3" opacity="0.9"/>
+            <rect x="52" y="75" width="40" height="26" rx="6" fill="#2D3142"/>
+            <rect x="108" y="75" width="40" height="26" rx="6" fill="#2D3142"/>
+            <path d="M92 84 L108 84" stroke="#2D3142" stroke-width="4"/>
+            <path d="M56 80 L70 95" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M112 80 L126 95" stroke="#FFF" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M85 120 Q 100 135 115 120" stroke="#2D3142" stroke-width="5" stroke-linecap="round" fill="none"/>
+            <circle cx="50" cy="115" r="7" fill="#FF7B90" opacity="0.7"/>
+            <circle cx="150" cy="115" r="7" fill="#FF7B90" opacity="0.7"/>
+            <path d="M20 50 L26 35 L41 29 L26 23 L20 8 L14 23 L-1 29 L14 35 Z" fill="#FFD152" transform="translate(10, 10) scale(0.6)"/>
+            <path d="M170 30 L174 20 L184 16 L174 12 L170 2 L166 12 L156 16 L166 20 Z" fill="#FFD152"/>
+          </svg>
+        `;
+      } else if (tier === 2) {
+        svgContent = `
+          <svg viewBox="0 0 200 240" class="w-full h-full drop-shadow-md" fill="none">
+            <rect x="75" y="6" width="50" height="16" rx="8" fill="#F4A261" stroke="#2D3142" stroke-width="4"/>
+            <rect x="30" y="22" width="140" height="195" rx="36" fill="#FFFDF5" stroke="#2D3142" stroke-width="6"/>
+            <rect x="42" y="145" width="116" height="60" rx="20" fill="#FFAA00" opacity="0.85"/>
+            <path d="M60 85 Q 75 75 85 85" stroke="#2D3142" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M115 85 Q 125 75 140 85" stroke="#2D3142" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M62 95 Q 72 102 82 95" stroke="#845EC2" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+            <path d="M118 95 Q 128 102 138 95" stroke="#845EC2" stroke-width="2.5" stroke-linecap="round" fill="none" opacity="0.6"/>
+            <ellipse cx="100" cy="112" rx="10" ry="14" fill="#2D3142"/>
+            <ellipse cx="100" cy="117" rx="7" ry="6" fill="#FF7B90"/>
+            <rect x="15" y="160" width="22" height="28" rx="4" fill="#FFF" stroke="#2D3142" stroke-width="3"/>
+            <path d="M15 168 Q 5 172 15 178" stroke="#2D3142" stroke-width="2.5" fill="none"/>
+            <path d="M22 152 Q 26 145 23 140" stroke="#A0AEC0" stroke-width="2" fill="none"/>
+            <path d="M165 160 L183 160 L180 188 L168 188 Z" fill="#E8FBF4" stroke="#2D3142" stroke-width="3"/>
+            <path d="M174 150 Q 170 145 174 140" stroke="#4D96FF" stroke-width="2" fill="none"/>
+          </svg>
+        `;
+      } else {
+        svgContent = `
+          <svg viewBox="0 0 200 240" class="w-full h-full drop-shadow-md animate-pulse-soft" fill="none">
+            <rect x="75" y="6" width="50" height="16" rx="8" fill="#FF5252" stroke="#2D3142" stroke-width="4"/>
+            <rect x="30" y="22" width="140" height="195" rx="36" fill="#FFFDF5" stroke="#2D3142" stroke-width="6"/>
+            <rect x="42" y="175" width="116" height="30" rx="14" fill="#FF5252" opacity="0.9"/>
+            <path d="M72 82 A 6 6 0 1 1 76 88 A 12 12 0 1 1 64 78" stroke="#2D3142" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M128 82 A 6 6 0 1 1 132 88 A 12 12 0 1 1 120 78" stroke="#2D3142" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M85 125 Q 92 118 100 125 T 115 125" stroke="#2D3142" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <path d="M152 75 C 152 75, 160 85, 157 90 C 154 94, 147 92, 147 88 Z" fill="#4D96FF"/>
+            <path d="M48 90 C 48 90, 56 100, 53 105 C 50 109, 43 107, 43 103 Z" fill="#4D96FF"/>
+            <path d="M100 135 L92 152 L103 152 L95 172" stroke="#FF5252" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        `;
+      }
+
+      container.innerHTML = svgContent;
+    }
+
+    function renderTopDrainSources() {
+      const container = document.getElementById('drainSourcesList');
+      const tickedKeys = Object.keys(checkedMap).filter(k => checkedMap[k]);
+
+      if (tickedKeys.length === 0) {
+        container.innerHTML = `
+          <div class="text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
+            ✨ 太棒了！最近幾乎沒有發現明顯的耗電元凶，請繼續維持良好的作息！
+          </div>
+        `;
+        return;
+      }
+
+      const top3 = tickedKeys.slice(0, 3).map(id => ALL_QUESTIONS_MAP[id]).filter(Boolean);
+      container.innerHTML = top3.map(q => `
+        <div class="inline-flex items-center gap-1.5 bg-white border border-amber-300 px-3 py-1.5 rounded-xl text-xs font-bold text-gray-800 shadow-sm">
+          <span>${q.drainIcon}</span>
+          <span>${q.drainName}</span>
+        </div>
+      `).join('');
+    }
+
+    function generateAndDownloadCard() {
+      if (!currentResultData) return;
+
+      const canvas = document.getElementById('exportCanvas');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width;
+      const H = canvas.height;
+
+      // 1. Background
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+      bgGrad.addColorStop(0, '#FFFDF8');
+      bgGrad.addColorStop(1, '#FFF5EA');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, W, H);
+
+      // Polka dots
+      ctx.fillStyle = 'rgba(230, 220, 205, 0.4)';
+      for (let x = 30; x < W; x += 50) {
+        for (let y = 30; y < H; y += 50) {
+          ctx.beginPath();
+          ctx.arc(x, y, 3, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // 2. Inner Card
+      drawRoundedRect(ctx, 40, 40, W - 80, H - 80, 40, '#FFFFFF', '#2D3142', 8);
+
+      // 3. Header Chip
+      drawRoundedRect(ctx, W/2 - 190, 85, 380, 50, 25, '#F2ECFA', '#845EC2', 3);
+      ctx.fillStyle = '#845EC2';
+      ctx.font = 'bold 24px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('⚡ 我的體內能量測驗結果', W/2, 118);
+
+      // 4. Main Title
+      ctx.fillStyle = '#2D3142';
+      ctx.font = '900 40px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(currentResultData.mainTitle.split('｜')[0], W/2, 195);
+      
+      if (currentResultData.mainTitle.split('｜')[1]) {
+        ctx.font = 'bold 28px "Noto Sans TC", sans-serif';
+        ctx.fillStyle = '#FF7B90';
+        ctx.fillText(currentResultData.mainTitle.split('｜')[1], W/2, 240);
+      }
+
+      // 5. Battery Drawing
+      drawCanvasBattery(ctx, W/2, 450, currentResultData.tier);
+
+      // 6. Battery Level Badge
+      drawRoundedRect(ctx, W/2 - 160, 600, 320, 60, 30, '#FFF7D6', '#FFAA00', 4);
+      ctx.fillStyle = '#7C4A03';
+      ctx.font = '900 28px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(currentResultData.batteryPctText, W/2, 642);
+
+      // 7. 3 Dimensions
+      const startY = 710;
+      drawDimensionBox(ctx, 100, startY, 210, 80, '❤️ 生活修復力', `${currentResultData.lifePct}%`, '#FFEBF0', '#FF7B90');
+      drawDimensionBox(ctx, 345, startY, 210, 80, '🥗 飲食與補水', `${currentResultData.dietPct}%`, '#E8FBF4', '#4ECCA3');
+      drawDimensionBox(ctx, 590, startY, 210, 80, '⚡ 身體狀態', `${currentResultData.bodyPct}%`, '#FFF9E6', '#FFAA00');
+
+      // 8. Top Drain Sources
+      const tickedKeys = Object.keys(checkedMap).filter(k => checkedMap[k]);
+      let drainStr = "無明顯過載，能量維持優秀！";
+      if (tickedKeys.length > 0) {
+        drainStr = "主要耗電：" + tickedKeys.slice(0, 3).map(id => {
+          const item = ALL_QUESTIONS_MAP[id];
+          return `${item.drainIcon} ${item.drainName}`;
+        }).join('　');
+      }
+      drawRoundedRect(ctx, 90, 825, W - 180, 70, 20, '#F9F9F6', '#E2E2D5', 2);
+      ctx.fillStyle = '#555555';
+      ctx.font = 'bold 22px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(drainStr, W/2, 868);
+
+      // 9. Core Slogan
+      ctx.fillStyle = '#845EC2';
+      ctx.font = '900 26px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('✨ 人體只佔 4%，卻決定你 100% 的活力與氣色！', W/2, 970);
+
+      // 10. Footer info
+      ctx.fillStyle = '#A0AEC0';
+      ctx.font = 'bold 20px "Noto Sans TC", sans-serif';
+      ctx.fillText('測測你的體內能量，正在開幾％省電模式？', W/2, 1030);
+
+      ctx.font = '16px "Noto Sans TC", sans-serif';
+      ctx.fillText('※ 本測驗為趣味性生活檢測，非醫療診斷。', W/2, 1070);
+
+      try {
+        const imageURL = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.download = `體內能量卡_${currentResultData.batteryNum}pct.png`;
+        downloadLink.href = imageURL;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        showToast('📸 能量卡已儲存至相簿／下載資料夾！');
+      } catch (err) {
+        showToast('無法直接下載圖片，請長按截圖保存！');
+      }
+    }
+
+    function drawRoundedRect(ctx, x, y, width, height, radius, fill, stroke, strokeWidth) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+
+      if (fill) {
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = strokeWidth || 2;
+        ctx.stroke();
+      }
+    }
+
+    function drawDimensionBox(ctx, x, y, w, h, title, val, bg, strokeColor) {
+      drawRoundedRect(ctx, x, y, w, h, 18, bg, strokeColor, 3);
+      ctx.fillStyle = '#2D3142';
+      ctx.font = 'bold 18px "Noto Sans TC", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(title, x + w/2, y + 33);
+
+      ctx.fillStyle = strokeColor;
+      ctx.font = '900 24px "Noto Sans TC", sans-serif';
+      ctx.fillText(val, x + w/2, y + 64);
+    }
+
+    function drawCanvasBattery(ctx, cx, cy, tier) {
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      drawRoundedRect(ctx, -35, -165, 70, 22, 10, '#F4A261', '#2D3142', 6);
+      drawRoundedRect(ctx, -95, -145, 190, 260, 45, '#FFFDF5', '#2D3142', 8);
+
+      let fillColor = '#4ECCA3';
+      let fillH = 220;
+      if (tier === 2) {
+        fillColor = '#FFAA00';
+        fillH = 80;
+      } else if (tier === 3) {
+        fillColor = '#FF5252';
+        fillH = 45;
+      }
+      drawRoundedRect(ctx, -80, 100 - fillH, 160, fillH, 20, fillColor, null);
+
+      if (tier === 1) {
+        drawRoundedRect(ctx, -65, -75, 55, 36, 10, '#2D3142', null);
+        drawRoundedRect(ctx, 10, -75, 55, 36, 10, '#2D3142', null);
+        ctx.strokeStyle = '#2D3142';
+        ctx.lineWidth = 6;
+        ctx.beginPath();
+        ctx.moveTo(-10, -60);
+        ctx.lineTo(10, -60);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(0, -10, 24, 0.1 * Math.PI, 0.9 * Math.PI, false);
+        ctx.stroke();
+      } else if (tier === 2) {
+        ctx.strokeStyle = '#2D3142';
+        ctx.lineWidth = 6;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.arc(-35, -55, 18, 1.1 * Math.PI, 1.9 * Math.PI);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(35, -55, 18, 1.1 * Math.PI, 1.9 * Math.PI);
+        ctx.stroke();
+        ctx.fillStyle = '#2D3142';
+        ctx.beginPath();
+        ctx.ellipse(0, -20, 14, 18, 0, 0, Math.PI * 2);
+        ctx.fill();
+      } else {
+        ctx.strokeStyle = '#2D3142';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(-35, -60, 14, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(35, -60, 14, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(-25, -15);
+        ctx.quadraticCurveTo(0, -25, 25, -15);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    async function handleShare() {
+      const shareData = {
+        title: '測測你的體內能量，正在開幾％省電模式？',
+        text: `我剛測完我的體內能量！結果是「${currentResultData.mainTitle}」(${currentResultData.batteryPctText})。快來測測看你開啟了幾％省電模式！⚡`,
+        url: window.location.href
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+          showToast('感謝分享！');
+          return;
+        } catch (e) {
+          // ignore or fallback
+        }
+      }
+
+      const copyText = `${shareData.text} 測驗連結：${window.location.href}`;
+      copyToClipboard(copyText);
+    }
+
+    function copyToClipboard(text) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          showToast('🔗 分享文字與連結已複製到剪貼簿！');
+        }).catch(() => {
+          fallbackExecCopy(text);
+        });
+      } else {
+        fallbackExecCopy(text);
+      }
+    }
+
+    function fallbackExecCopy(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        showToast('🔗 分享文字與連結已複製！');
+      } catch (err) {
+        showToast('請直接截圖或複製網址分享！');
+      }
+      document.body.removeChild(textArea);
+    }
+
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.remove('opacity-0');
+      toast.classList.add('opacity-100');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0');
+      }, 2500);
+    }
+  </script>
+</body>
+</html>
